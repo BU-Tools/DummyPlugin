@@ -5,34 +5,32 @@
 
 using namespace BUTool;
 
-DummyDevice::DummyDevice()
-    : CommandList<DummyDevice>("Dummy"),
+DummyDevice::DummyDevice(std::vector<std::string> /*arg*/)
+  : CommandList<DummyDevice>("Dummy"),
     myDummy(NULL) {
-        //constructor takes NO arguments
-        //setup commands
-        LoadCommandList();
-    }
+  myDummy = new Dummy();
+  //setup commands
+  LoadCommandList();  
+}
 
-    DummyDevice::~DummyDevice() {
-        if (myDummy) {
-            delete myDummy;
-        }
-    }
+DummyDevice::~DummyDevice() {
+  if (myDummy) {
+    delete myDummy;
+  }
+}
 
     void DummyDevice::LoadCommandList() {
         // general commands (launcher commands)
         AddCommand("start",&DummyDevice::Start,
                    "instantiates the dummy\n" \
                    "Usage: \n"                \
-                   " start\n",
-                   &DummyDevice::RegisterAutoComplete);
+                   " start\n");
         AddCommandAlias("s","start");
 
         AddCommand("operations",&DummyDevice::Operations,
                    "performs addition, subtraction, multiplication \n" \
                    "Usage: \n"                                         \
-                   " operations\n",
-                   &DummyDevice::RegisterAutoComplete);
+                   " operations\n");
         AddCommandAlias("o","operations");
     }
 
@@ -46,6 +44,7 @@ DummyDevice::DummyDevice()
             myDummy = new Dummy();
         }
         */
+	return CommandReturn::OK;
     }
 
     CommandReturn::status DummyDevice::Operations(std::vector<std::string> strArg,std::vector<uint64_t> intArg) {
