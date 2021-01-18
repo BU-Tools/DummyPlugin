@@ -1,0 +1,4 @@
+*.patch
+**/lib
+**/obj
+*.sh
