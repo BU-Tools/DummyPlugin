@@ -4,7 +4,7 @@
 
 /// constructor 
 Dummy::Dummy() {
-    std::cout << "object is being created, constructor called" << std::endl;
+    std::cout << "Hello World - from Dummy" << std::endl;
 }
 
 // deconstructor 
@@ -31,10 +31,4 @@ float Dummy::multiply(float x, float y) {
     res = x * y;
     std::cout << x << " * " << y << " = " << res << std::endl;
     return res;
-}
-
-void helloWorld(std::string const & _helloText) {
-    // do nothing for now
-    std::string standIn;
-    standIn = _helloText;
 }

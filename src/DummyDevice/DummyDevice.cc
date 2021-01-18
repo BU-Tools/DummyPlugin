@@ -5,7 +5,7 @@
 
 using namespace BUTool;
 
-DummyDevice::DummyDevice(std::vector<std::string> /*arg*/)
+DummyDevice::DummyDevice(std::vector<std::string> /* arg */)
   : CommandList<DummyDevice>("Dummy"),
     myDummy(NULL) {
   myDummy = new Dummy();
