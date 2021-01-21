@@ -9,11 +9,13 @@
 #include <iostream>
 
 #include <Dummy/Dummy.hh>
+#include "DummyTextIO.hh"
 
 namespace BUTool {
 
-  class DummyDevice : public CommandList<DummyDevice> {
+  class DummyDevice : public DummyTextIO, public CommandList<DummyDevice> {
   public:
+    // vector of strings -> ofstream
     DummyDevice(std::vector<std::string> arg);
     ~DummyDevice();
   private:

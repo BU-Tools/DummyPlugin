@@ -5,12 +5,13 @@
 
 using namespace BUTool;
 
+// vector of strings -> ofstream
 DummyDevice::DummyDevice(std::vector<std::string> /* arg */)
   : CommandList<DummyDevice>("Dummy"),
     myDummy(NULL) {
   myDummy = new Dummy();
-  //setup commands
-  LoadCommandList();  
+  LoadCommandList();
+  // parse arg -> determines what output stream to use
 }
 
 DummyDevice::~DummyDevice() {
@@ -50,7 +51,10 @@ void DummyDevice::LoadCommandList() {
 CommandReturn::status DummyDevice::Start(std::vector<std::string>,
                                          std::vector<uint64_t>) {
     if (myDummy) {
-        printf("dummy already created\n");
+        //printf("dummy already created\n");
+        controller.Print("dummy already created\n");
+        // example formatting
+        controller.Print("floats: %4.2f %+.0e %E \n", 3.1416, 3.1416, 3.1416);
         return CommandReturn::OK;
     }
     /*
@@ -67,7 +71,8 @@ CommandReturn::status DummyDevice::Operations(std::vector<std::string> strArg,
     // intArg = two integers (floats)
 
     if (!myDummy) {
-        printf("dummy not yet created\n");
+        //printf("dummy not yet created\n");
+        controller.Print("dummy not yet created\n");
         return CommandReturn::OK;
     }
 
@@ -86,6 +91,7 @@ CommandReturn::status DummyDevice::Operations(std::vector<std::string> strArg,
     float y = intArg[1];
 
     // work out different cases
+    /* Need to capture the output from the operations using controller.Print() */
     if (strArg[0] == "add") {
         myDummy->add(x,y);
     }
