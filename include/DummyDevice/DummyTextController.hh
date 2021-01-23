@@ -9,7 +9,8 @@
 
 class DummyTextController {
 public:
-    void Print(const char *fmt, ...);
+    //void Print(std::vector<std::unique_ptr<std::ostream>>::iterator it, const char *fmt, ...);
+    void Print(std::vector<std::unique_ptr<std::ostream>> v, const char *fmt, ...);
     void PrintDebug(const char *fmt, ...);
     void PrintError(const char *fmt, ...);
 };

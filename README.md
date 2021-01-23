@@ -9,3 +9,14 @@ DummyTextIO is a class from which the plugin class publicly inherits and through
 ## Build instructions 
 
 Clone BUTool, then checkout this code into `plugins/` directory. Then follow BUTool buold instructions.
+
+
+## Use
+
+### V0.1
+```
+source plugins/DummyPlugin/env.sh
+add_device DUMMY
+addstream
+```
+addstream adds a cout stream to the `streams` vector

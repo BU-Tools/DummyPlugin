@@ -1,11 +1,9 @@
 //#include <DummyTextIO/DummyTextIO.hh>
 #include <DummyDevice/DummyTextIO.hh>
 
-/*
 void DummyTextIO::AddOutputStream(std::unique_ptr<std::ostream> stream) {
-    streams.emplace_back(stream);
+    streams.emplace_back(std::move(stream));
 }
-*/
 
 void DummyTextIO::ResetStreams() {
     /*

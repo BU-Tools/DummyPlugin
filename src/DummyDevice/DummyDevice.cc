@@ -1,7 +1,8 @@
 #include <DummyDevice/DummyDevice.hh>
 
-#include<string>
+#include <string>
 #include <iostream>
+#include <memory>
 
 using namespace BUTool;
 
@@ -11,7 +12,6 @@ DummyDevice::DummyDevice(std::vector<std::string> /* arg */)
     myDummy(NULL) {
   myDummy = new Dummy();
   LoadCommandList();
-  // parse arg -> determines what output stream to use
 }
 
 DummyDevice::~DummyDevice() {
@@ -46,15 +46,43 @@ void DummyDevice::LoadCommandList() {
                 "performs multiplication of two numbers\n" \
                 " Usage:\n"                                         \
                 " multiply x y\n");
+
+    AddCommand("addstream",&DummyDevice::AddStream,
+                "adds output stream to streams vector\n" \
+                " Usage:\n"                                         \
+                " addstream stream\n");
+}
+
+// compiler doesn't support make_unique, work-around
+template<typename T, typename... Args>
+std::unique_ptr<T> make_unique(Args&&... args)
+{
+    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+}
+
+CommandReturn::status DummyDevice::AddStream(std::vector<std::string> strArg,
+                                             std::vector<uint64_t> /* intArg */) {
+    if (strArg.size() != 1) {
+        // add cout stream
+        AddOutputStream(make_unique<std::ostream>(std::cout.rdbuf()));
+    }
+    /*
+    else {
+        // add file stream - BROKEN
+        const std::string filename = strArg[0];
+        AddOutputStream(make_unique<std::ofstream>(&filename));
+    }
+    */
+    return CommandReturn::OK;
 }
 
 CommandReturn::status DummyDevice::Start(std::vector<std::string>,
                                          std::vector<uint64_t>) {
     if (myDummy) {
         //printf("dummy already created\n");
-        controller.Print("dummy already created\n");
+        controller.Print(std::move(streams), "dummy already created\n");
         // example formatting
-        controller.Print("floats: %4.2f %+.0e %E \n", 3.1416, 3.1416, 3.1416);
+        controller.Print(std::move(streams), "floats: %4.2f %+.0e %E \n", 3.1416, 3.1416, 3.1416);
         return CommandReturn::OK;
     }
     /*
@@ -72,7 +100,7 @@ CommandReturn::status DummyDevice::Operations(std::vector<std::string> strArg,
 
     if (!myDummy) {
         //printf("dummy not yet created\n");
-        controller.Print("dummy not yet created\n");
+        controller.Print(std::move(streams), "dummy not yet created\n");
         return CommandReturn::OK;
     }
 
