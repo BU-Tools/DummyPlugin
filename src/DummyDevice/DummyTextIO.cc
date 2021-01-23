@@ -6,9 +6,5 @@ void DummyTextIO::AddOutputStream(std::unique_ptr<std::ostream> stream) {
 }
 
 void DummyTextIO::ResetStreams() {
-    /*
-    for (auto &stream : streams) {
-        &stream.get()->flush();
-    }
-    */
+    streams.clear();
 }

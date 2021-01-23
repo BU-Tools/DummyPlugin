@@ -51,13 +51,27 @@ void DummyDevice::LoadCommandList() {
                 "adds output stream to streams vector\n" \
                 " Usage:\n"                                         \
                 " addstream stream\n");
+
+    AddCommand("resetvector",&DummyDevice::ResetVector,
+                "clears streams vector\n" \
+                " Usage:\n"                                         \
+                " resetvector\n");
 }
 
-// compiler doesn't support make_unique, work-around
+// compiler doesn't support make_unique, work-around (need to fix)
 template<typename T, typename... Args>
 std::unique_ptr<T> make_unique(Args&&... args)
 {
     return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+}
+
+CommandReturn::status DummyDevice::ResetVector(std::vector<std::string> /* strArg */,
+                                                std::vector<uint64_t> /* intArg */) {
+    // at this point, streams *should* have ostreams to print to 
+    controller.Print(streams, "resetting streams vector\n");
+    // after this, streams will be empty
+    ResetStreams();
+    return CommandReturn::OK;
 }
 
 CommandReturn::status DummyDevice::AddStream(std::vector<std::string> strArg,
@@ -79,10 +93,12 @@ CommandReturn::status DummyDevice::AddStream(std::vector<std::string> strArg,
 CommandReturn::status DummyDevice::Start(std::vector<std::string>,
                                          std::vector<uint64_t>) {
     if (myDummy) {
-        //printf("dummy already created\n");
-        controller.Print(std::move(streams), "dummy already created\n");
+        //printf("dummy already created\n");        // replace this with Controller Print()
+
+        // no need to move vector of unique_ptrs, since Print() takes const l-value reference to streams vector
+        controller.Print(/*std::move(streams),*/streams, "message from Controller\n");
         // example formatting
-        controller.Print(std::move(streams), "floats: %4.2f %+.0e %E \n", 3.1416, 3.1416, 3.1416);
+        controller.Print(/*std::move(streams),*/streams, "%p\n", NULL);
         return CommandReturn::OK;
     }
     /*
@@ -100,7 +116,7 @@ CommandReturn::status DummyDevice::Operations(std::vector<std::string> strArg,
 
     if (!myDummy) {
         //printf("dummy not yet created\n");
-        controller.Print(std::move(streams), "dummy not yet created\n");
+        controller.Print(/*std::move(streams),*/streams, "dummy not yet created\n");
         return CommandReturn::OK;
     }
 

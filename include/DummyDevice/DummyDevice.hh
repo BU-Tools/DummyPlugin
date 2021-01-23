@@ -36,8 +36,9 @@ namespace BUTool {
     CommandReturn::status Subtract(std::vector<std::string>, std::vector<uint64_t>);
     CommandReturn::status Multiply(std::vector<std::string>, std::vector<uint64_t>);
 
-    // call to AddOutputStream() in TextIO class
+    // call to AddOutputStream() and ResetStreams() in TextIO class
     CommandReturn::status AddStream(std::vector<std::string>, std::vector<uint64_t>);
+    CommandReturn::status ResetVector(std::vector<std::string>, std::vector<uint64_t>);
 
     // add new command (sub command) auto-complete here
     //std::string autoComplete_Help(std::vector<std::string> const &, std::string const &, int);
