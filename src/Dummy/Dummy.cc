@@ -15,20 +15,17 @@ Dummy::~Dummy() {
 float Dummy::add(float x, float y) {
     float res;
     res = x + y;
-    std::cout << x << " + " << y << " = " << res << std::endl;
     return res;
 }
 
 float Dummy::subtract(float x, float y) {
     float res;
     res = x - y;
-    std::cout << x << " - " << y << " = " << res << std::endl;
     return res;
 }
 
 float Dummy::multiply(float x, float y) {
     float res;
     res = x * y;
-    std::cout << x << " * " << y << " = " << res << std::endl;
     return res;
 }

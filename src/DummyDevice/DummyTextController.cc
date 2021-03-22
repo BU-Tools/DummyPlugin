@@ -12,6 +12,9 @@ void DummyTextController::Print(std::vector<std::unique_ptr<std::ostream>> const
    for (auto &stream : v) {
        *stream.get() << Printer(fmt);
    }
+   for (auto &stream : streams) {
+       
+   }
 }
 
 

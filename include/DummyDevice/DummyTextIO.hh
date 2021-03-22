@@ -17,7 +17,7 @@ protected:
     // vector containing unique_ptr to ostream objects
     std::vector<std::unique_ptr<std::ostream>> streams;
     // TextIOController -> should be able to access streams vector
-    DummyTextController controller;
+   DummyTextController controller;
 };
 
 #endif 

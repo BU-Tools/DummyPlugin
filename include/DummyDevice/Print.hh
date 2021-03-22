@@ -2,7 +2,7 @@
 
 #ifndef __PRINT_HH__
 #define __PRINT_HH__
-//#pragma once
+#pragma once
 
 #include <iostream>
 

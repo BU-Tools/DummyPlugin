@@ -2,7 +2,8 @@
 #include <cstdarg>
 #include <iostream>
 #include <cstdio>
-//#include <Print/Print.hh>
+#include <stdlib.h>
+#include <stdio.h>
 #include <DummyDevice/Print.hh>
 
 printer Printer(const char *fmt, ...) {

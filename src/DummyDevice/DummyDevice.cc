@@ -1,8 +1,5 @@
 #include <DummyDevice/DummyDevice.hh>
-
-#include <string>
-#include <iostream>
-#include <memory>
+#include <DummyDevice/Print.hh>
 
 using namespace BUTool;
 
@@ -56,6 +53,11 @@ void DummyDevice::LoadCommandList() {
                 "clears streams vector\n" \
                 " Usage:\n"                                         \
                 " resetvector\n");
+    
+    AddCommand("printtest",&DummyDevice::PrintTest,
+                "tests the Print() method\n" \
+                " Usage:\n" \
+                "printtest\n");
 }
 
 // compiler doesn't support make_unique, work-around (need to fix)
@@ -80,32 +82,27 @@ CommandReturn::status DummyDevice::AddStream(std::vector<std::string> strArg,
         // add cout stream
         AddOutputStream(make_unique<std::ostream>(std::cout.rdbuf()));
     }
-    /*
-    else {
-        // add file stream - BROKEN
-        const std::string filename = strArg[0];
-        AddOutputStream(make_unique<std::ofstream>(&filename));
-    }
-    */
     return CommandReturn::OK;
 }
 
 CommandReturn::status DummyDevice::Start(std::vector<std::string>,
                                          std::vector<uint64_t>) {
-    if (myDummy) {
-        //printf("dummy already created\n");        // replace this with Controller Print()
+    //printf("dummy already created\n");        // replace this with Controller Print()
+    // no need to move vector of unique_ptrs, since Print() takes const l-value reference to streams vector
+    controller.Print(/*std::move(streams),*/streams, "message from Controller\n");
+    // example formatting
+    controller.Print(/*std::move(streams),*/streams, "%3d\n", 23);
+    return CommandReturn::OK;
+}
 
-        // no need to move vector of unique_ptrs, since Print() takes const l-value reference to streams vector
-        controller.Print(/*std::move(streams),*/streams, "message from Controller\n");
-        // example formatting
-        controller.Print(/*std::move(streams),*/streams, "%p\n", NULL);
-        return CommandReturn::OK;
-    }
-    /*
-    try {
-        myDummy = new Dummy();
-    }
-    */
+CommandReturn::status DummyDevice::PrintTest(std::vector<std::string> /*strArg*/,
+                                             std::vector<uint64_t> /*intArg*/) {
+
+    // printer only works when passed the values directly. This means that the controller.Print() functionality is flawed
+    std::cout << Printer("string test\n");
+    std::cout << Printer("decimal test %d\n", 10);
+    std::cout << Printer("hex test 0x%08x\n", 0xDEADBEEF);
+
     return CommandReturn::OK;
 }
 
@@ -113,37 +110,19 @@ CommandReturn::status DummyDevice::Operations(std::vector<std::string> strArg,
                                               std::vector<uint64_t> intArg) {
     // strArg = "add", "subtract", or "multiply"
     // intArg = two integers (floats)
+    std::string operation(strArg[0]);
+    float x(intArg[1]);
+    float y(intArg[2]);
 
-    if (!myDummy) {
-        //printf("dummy not yet created\n");
-        controller.Print(/*std::move(streams),*/streams, "dummy not yet created\n");
-        return CommandReturn::OK;
-    }
-
-
-    if (strArg.size() != 1) {
-        // need 1 string argument (which command to use)
-        return CommandReturn::BAD_ARGS;
-    }
-
-    if (intArg.size() != 2) {
-        // need exactly 2 numbers
-        return CommandReturn::BAD_ARGS;
-    }
-
-    float x = intArg[0];
-    float y = intArg[1];
-
-    // work out different cases
     /* Need to capture the output from the operations using controller.Print() */
-    if (strArg[0] == "add") {
-        myDummy->add(x,y);
+    if (operation == "add") {
+        controller.Print(streams, "%f + %f = %f\n", x, y, myDummy->add(x,y));
     }
-    else if (strArg[0] == "subtract") {
-        myDummy->subtract(x,y);
+    else if (operation == "subtract") {
+        controller.Print(streams, "%f - %f = %f\n", x, y, myDummy->subtract(x,y));
     }
-    else if (strArg[0] == "multiply") {
-        myDummy->multiply(x,y);
+    else if (operation == "multiply") {
+        controller.Print(streams, "%f * %f = %f\n", x, y, myDummy->multiply(x,y));
     }
 
     return CommandReturn::OK;
@@ -158,7 +137,8 @@ CommandReturn::status DummyDevice::Add(std::vector<std::string> /* strArg */,
     float x = intArg[0];
     float y = intArg[1];
     
-    myDummy->add(x,y);
+    controller.Print(streams, "%f + %f = %f\n", x, y, myDummy->add(x,y));
+
     return CommandReturn::OK;
 }
 
@@ -171,7 +151,8 @@ CommandReturn::status DummyDevice::Subtract(std::vector<std::string> /* strArg *
     float x = intArg[0];
     float y = intArg[1];
     
-    myDummy->subtract(x,y);
+    controller.Print(streams, "%f - %f = %f\n", x, y, myDummy->add(x,y));
+
     return CommandReturn::OK;
 }
 
@@ -184,7 +165,8 @@ CommandReturn::status DummyDevice::Multiply(std::vector<std::string> /* strArg *
     float x = intArg[0];
     float y = intArg[1];
     
-    myDummy->multiply(x,y);
+    controller.Print(streams, "%f * %f = %f\n", x, y, myDummy->add(x,y));
+
     return CommandReturn::OK;
 }
 
