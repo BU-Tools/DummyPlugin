@@ -31,7 +31,7 @@ public:
     void PrintString(const char *fmt, ...);
     void PrintFile(const char *fmt, ...);
 
-protected:  
+private:  
     std::vector<std::ostream*> errorStreams;         // stderr
     std::vector<std::ostream*> debugStreams;         // stdout
     std::vector<std::ostringstream*> stringStreams;   // sstreams
