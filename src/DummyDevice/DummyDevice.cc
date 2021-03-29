@@ -49,60 +49,46 @@ void DummyDevice::LoadCommandList() {
                 " Usage:\n"                                         \
                 " addstream stream\n");
 
-    AddCommand("resetvector",&DummyDevice::ResetVector,
-                "clears streams vector\n" \
+    AddCommand("resetstream",&DummyDevice::ResetStream,
+                "clears a streams vector\n" \
                 " Usage:\n"                                         \
-                " resetvector\n");
+                " resetstream\n");
     
     AddCommand("printtest",&DummyDevice::PrintTest,
                 "tests the Print() method\n" \
                 " Usage:\n" \
                 "printtest\n");
+    
+    AddCommand("stringtest",&DummyDevice::StringTest,
+               "tests r/w on a stringstream\n" \
+               " Usage:\n" \
+               "stringtest\n");
 }
 
-// compiler doesn't support make_unique, work-around (need to fix)
-template<typename T, typename... Args>
-std::unique_ptr<T> make_unique(Args&&... args)
-{
-    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
-}
-
-CommandReturn::status DummyDevice::ResetVector(std::vector<std::string> /* strArg */,
+CommandReturn::status DummyDevice::ResetStream(std::vector<std::string> /* strArg */,
                                                 std::vector<uint64_t> /* intArg */) {
-    // at this point, streams *should* have ostreams to print to 
-    controller.Print(streams, "resetting streams vector\n");
-    // after this, streams will be empty
-    ResetStreams();
+    
+    ResetStreams(debugStreams);
     return CommandReturn::OK;
 }
 
-CommandReturn::status DummyDevice::AddStream(std::vector<std::string> strArg,
+CommandReturn::status DummyDevice::AddStream(std::vector<std::string> /* strArg */,
                                              std::vector<uint64_t> /* intArg */) {
-    if (strArg.size() != 1) {
-        // add cout stream
-        AddOutputStream(make_unique<std::ostream>(std::cout.rdbuf()));
-    }
+    AddOutputStream(&std::cout, debugStreams);
     return CommandReturn::OK;
 }
 
 CommandReturn::status DummyDevice::Start(std::vector<std::string>,
                                          std::vector<uint64_t>) {
-    //printf("dummy already created\n");        // replace this with Controller Print()
-    // no need to move vector of unique_ptrs, since Print() takes const l-value reference to streams vector
-    controller.Print(/*std::move(streams),*/streams, "message from Controller\n");
-    // example formatting
-    controller.Print(/*std::move(streams),*/streams, "%3d\n", 23);
+    PrintDebug("Hello world %d\n", 1);
     return CommandReturn::OK;
 }
 
 CommandReturn::status DummyDevice::PrintTest(std::vector<std::string> /*strArg*/,
                                              std::vector<uint64_t> /*intArg*/) {
 
-    // printer only works when passed the values directly. This means that the controller.Print() functionality is flawed
-    std::cout << Printer("string test\n");
-    std::cout << Printer("decimal test %d\n", 10);
-    std::cout << Printer("hex test 0x%08x\n", 0xDEADBEEF);
-
+    PrintDebug("%s : 0x%.8X\n", "test 1", 0xdeadbeef);
+    PrintDebug("%s : \n\t%d\n\t0x%.8X\n", "test 2", 100, 0xBAADF00D);
     return CommandReturn::OK;
 }
 
@@ -116,13 +102,13 @@ CommandReturn::status DummyDevice::Operations(std::vector<std::string> strArg,
 
     /* Need to capture the output from the operations using controller.Print() */
     if (operation == "add") {
-        controller.Print(streams, "%f + %f = %f\n", x, y, myDummy->add(x,y));
+        PrintDebug("%f + %f = %f\n", x, y, x+y);
     }
     else if (operation == "subtract") {
-        controller.Print(streams, "%f - %f = %f\n", x, y, myDummy->subtract(x,y));
+        PrintDebug("%f - %f = %f\n", x, y, x-y);
     }
     else if (operation == "multiply") {
-        controller.Print(streams, "%f * %f = %f\n", x, y, myDummy->multiply(x,y));
+        PrintDebug("%f * %f = %f\n", x, y, x*y);
     }
 
     return CommandReturn::OK;
@@ -137,7 +123,7 @@ CommandReturn::status DummyDevice::Add(std::vector<std::string> /* strArg */,
     float x = intArg[0];
     float y = intArg[1];
     
-    controller.Print(streams, "%f + %f = %f\n", x, y, myDummy->add(x,y));
+    PrintDebug("%f + %f = %f\n", x, y, x+y);
 
     return CommandReturn::OK;
 }
@@ -151,7 +137,7 @@ CommandReturn::status DummyDevice::Subtract(std::vector<std::string> /* strArg *
     float x = intArg[0];
     float y = intArg[1];
     
-    controller.Print(streams, "%f - %f = %f\n", x, y, myDummy->add(x,y));
+    PrintDebug("%f - %f = %f\n", x, y, x-y);
 
     return CommandReturn::OK;
 }
@@ -165,7 +151,36 @@ CommandReturn::status DummyDevice::Multiply(std::vector<std::string> /* strArg *
     float x = intArg[0];
     float y = intArg[1];
     
-    controller.Print(streams, "%f * %f = %f\n", x, y, myDummy->add(x,y));
+    PrintDebug("%f * %f = %f\n", x, y, x*y);
+
+    return CommandReturn::OK;
+}
+
+CommandReturn::status DummyDevice::StringTest(std::vector<std::string>,
+                                 std::vector<uint64_t>) {
+    // mimicking the behavior of ApolloSMDevice::Read
+    // https://github.com/BU-Tools/BUTool/blob/3716389c20e8e8708c02eccf47d74222bf290cf8/src/helpers/register_helper.cc#L242
+
+    std::vector<std::string> names;
+    for (int i=0; i<10; i++) {
+        names.push_back(std::string("PL_MEM.SCRATCH.WORD_0"+std::to_string(i)));
+    }
+
+    // write to multiple streams:
+    std::ostringstream oss;
+    AddOutputStream(&oss, stringStreams);
+    AddOutputStream(&std::cout, debugStreams);
+
+    for (size_t iName=0; iName<names.size(); iName++) {
+        PrintDebug("Writing to stringstream...\n");
+        PrintString("%50s: 0x%08X\n", names[iName].c_str(), 0xdeadbeef);
+    }
+
+    PrintDebug("Reading from the stringstream:\n");
+
+    for (auto &stream : stringStreams) {
+        PrintDebug(stream->str().c_str());
+    }
 
     return CommandReturn::OK;
 }

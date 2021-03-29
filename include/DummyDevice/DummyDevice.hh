@@ -30,7 +30,7 @@ namespace BUTool {
     // add new commands here
     // instantiates the Dummy obj
     CommandReturn::status Start(std::vector<std::string>, std::vector<uint64_t>);
-    // performs a given operation (not working atm)
+    // performs a given operation
     CommandReturn::status Operations(std::vector<std::string>, std::vector<uint64_t>);
 
     // perform the operations individually
@@ -40,13 +40,13 @@ namespace BUTool {
 
     // call to AddOutputStream() and ResetStreams() in TextIO class
     CommandReturn::status AddStream(std::vector<std::string>, std::vector<uint64_t>);
-    CommandReturn::status ResetVector(std::vector<std::string>, std::vector<uint64_t>);
+    CommandReturn::status ResetStream(std::vector<std::string>, std::vector<uint64_t>);
 
     // test Print() method
     CommandReturn::status PrintTest(std::vector<std::string>, std::vector<uint64_t>);
 
-    // add new command (sub command) auto-complete here
-    //std::string autoComplete_Help(std::vector<std::string> const &, std::string const &, int);
+    // testing out writing to and reading from a stringstream
+    CommandReturn::status StringTest(std::vector<std::string>, std::vector<uint64_t>);
   };
 
     // register Dummydevice with factory

@@ -1,6 +1,7 @@
 #ifndef __DUMMY_TEXT_CONTROLLER_HH__
 #define __DUMMY_TEXT_CONTROLLER_HH__
 
+/*
 //#include <Print/Print.hh>
 #include "Print.hh"
 #include <vector>
@@ -15,5 +16,6 @@ public:
     void PrintDebug(const char *fmt, ...);
     void PrintError(const char *fmt, ...);
 };
+*/
 
 #endif
