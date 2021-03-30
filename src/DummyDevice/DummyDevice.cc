@@ -63,6 +63,9 @@ void DummyDevice::LoadCommandList() {
                "tests r/w on a stringstream\n" \
                " Usage:\n" \
                "stringtest\n");
+    
+    AddCommand("filetest",&DummyDevice::FileTest,
+               " ");
 }
 
 /*
@@ -216,9 +219,29 @@ CommandReturn::status DummyDevice::StringTest(std::vector<std::string>,
     }
 
     // the command result would now be captured in the stringstream
-    // the stringstream can then be read out on the herd side:
+    // the stringstream can then be read out on the herd side, since it owns the stringstream
     std::cout << "from stringstream:\n" << oss.str(); 
 
     return CommandReturn::OK;
 }
 
+CommandReturn::status DummyDevice::FileTest(std::vector<std::string>, std::vector<uint64_t>) {
+    // clear whatever is in the vector (we'll just use INFO vector)
+    ResetStreams(Level::INFO);
+
+    // add three streams to INFO level vector
+    AddOutputStream(Level::INFO, &std::cout);
+    std::ostringstream oss;
+    AddOutputStream(Level::INFO, &oss);
+    std::ofstream ofs("fileTest.txt", std::ofstream::out);
+    AddOutputStream(Level::INFO, &ofs);
+
+    // write something to all streams 
+    Print(Level::INFO, "writing to %d %s\n",3,"streams");
+
+    std::cout << "from stringstream: " << oss.str();
+
+    ResetStreams(Level::INFO);
+
+    return CommandReturn::OK;
+}

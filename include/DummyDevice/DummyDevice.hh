@@ -48,6 +48,9 @@ namespace BUTool {
 
     // testing out writing to and reading from a stringstream
     CommandReturn::status StringTest(std::vector<std::string>, std::vector<uint64_t>);
+
+    // testing out writing to multiple streams at once
+    CommandReturn::status FileTest(std::vector<std::string>, std::vector<uint64_t>);
   };
 
     // register Dummydevice with factory
