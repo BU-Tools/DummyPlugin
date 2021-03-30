@@ -2,6 +2,7 @@
 
 DummyTextIO::DummyTextIO(void) {
     for (int i=0; i<3; i++) {
+        // just to instantiate the Controllers with some stream - can change later
         controllers.push_back(DummyTextController(&std::cout));
     }
 }

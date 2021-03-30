@@ -237,9 +237,10 @@ CommandReturn::status DummyDevice::FileTest(std::vector<std::string>, std::vecto
     AddOutputStream(Level::INFO, &ofs);
 
     // write something to all streams 
-    Print(Level::INFO, "writing to %d %s\n",3,"streams");
+    Print(Level::INFO, "\twriting to %d %s\n",3,"streams");
+    Print(Level::INFO, "\t0x%08X\n", 0xdeadbeef);
 
-    std::cout << "from stringstream: " << oss.str();
+    std::cout << "from stringstream:\n" << oss.str();
 
     ResetStreams(Level::INFO);
 
