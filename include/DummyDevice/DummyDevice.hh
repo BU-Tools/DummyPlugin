@@ -39,8 +39,9 @@ namespace BUTool {
     CommandReturn::status Multiply(std::vector<std::string>, std::vector<uint64_t>);
 
     // call to AddOutputStream() and ResetStreams() in TextIO class
-    CommandReturn::status AddStream(std::vector<std::string>, std::vector<uint64_t>);
-    CommandReturn::status ResetStream(std::vector<std::string>, std::vector<uint64_t>);
+    /* these should not be user-facing functions */
+    //CommandReturn::status AddStream(std::vector<std::string>, std::vector<uint64_t>);
+    //CommandReturn::status ResetStream(std::vector<std::string>, std::vector<uint64_t>);
 
     // test Print() method
     CommandReturn::status PrintTest(std::vector<std::string>, std::vector<uint64_t>);

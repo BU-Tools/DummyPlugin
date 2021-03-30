@@ -1,4 +1,3 @@
-//#define _GNU_SOURCE
 #include <DummyDevice/Print.hh>
 
 printer printerHelper(const char *fmt, va_list argp) {
@@ -12,6 +11,6 @@ printer printerHelper(const char *fmt, va_list argp) {
 
 std::ostream& operator<<(std::ostream& os, printer b) {
     os<<b.s;
-    free(b.s);
+    //free(b.s);
     return os;
 }

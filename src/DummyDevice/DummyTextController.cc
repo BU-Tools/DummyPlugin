@@ -1,33 +1,39 @@
+#include <DummyDevice/DummyTextController.hh>
 
-//#include <DummyDevice/DummyTextController.hh>
-
-/* 
-   Pass the unique_ptrs by const l-value reference
-   This ensures that the Print() function only uses 
-   the unique_ptr for the duration of the fn's execution
- */
-
-/*
-void DummyTextController::Print(std::vector<std::unique_ptr<std::ostream>> const &v, const char *fmt, ...) {
-   //debug - if streams vector empty, "Print() called" will be written to console twice
-   std::cout << "Print() called" << std::endl;
-   // iterate through vector, use << overload to enter formatted text to the ostreams
-   for (auto &stream : v) {
-       *stream.get() << Printer(fmt);
-   }
-   for (auto &stream : streams) {
-       
-   }
+DummyTextController::DummyTextController(std::ostream *os) {
+    streams.push_back(os);
 }
 
+void DummyTextController::Print(const char *fmt, ...) {
+    // wrapper around printerHelper to allow variable argument forwarding
+    va_list argp;
+    va_start(argp, fmt);
+    printer Printer = printerHelper(fmt, argp);
+    va_end(argp);
 
-
-// other Print_() functionality to be added later
-void DummyTextController::PrintDebug(const char *fmt, ...) {
-    std::cout << Printer(fmt);
+    std::vector<std::ostream*>::iterator it;
+    for (it = streams.begin(); it != streams.end(); it++) {
+        *(*it) << Printer;
+    }
 }
 
-void DummyTextController::PrintError(const char *fmt, ...) {
-    std::cout << Printer(fmt);
+void DummyTextController::Print(printer a) {
+    std::vector<std::ostream*>::iterator it;
+    for (it = streams.begin(); it != streams.end(); it++) {
+        *(*it) << a;
+    }
 }
-*/
+
+void DummyTextController::AddOutputStream(std::ostream *os) {
+    streams.push_back(os);
+}
+
+void DummyTextController::ResetStreams() {
+    std::vector<std::ostream*>::iterator it;
+    /*
+    for (it = streams.begin(); it != streams.end(); it++) {
+        delete (*it);
+    }
+    */
+    streams.clear();
+}

@@ -1,75 +1,28 @@
-//#include <DummyTextIO/DummyTextIO.hh>
 #include <DummyDevice/DummyTextIO.hh>
 
-void DummyTextIO::AddOutputStream(std::ostream *stream,
-                                  std::vector<std::ostream*> &streams) {
-    streams.push_back(stream);
-}
-
-void DummyTextIO::AddOutputStream(std::ostringstream *stream,
-                                  std::vector<std::ostringstream*> &streams) {
-    streams.push_back(stream);
-}
-
-void DummyTextIO::AddOutputStream(std::ofstream *stream,
-                                  std::vector<std::ofstream*> &streams) {
-    streams.push_back(stream);
-}
-
-
-void DummyTextIO::ResetStreams(std::vector<std::ostream*> &streams) {
-    // ptrs owned by DummyTextIO, must delete them before clearing vector
-    // since not using smart pointers (yet)
-    for (auto &ptr : streams) {
-        delete &ptr;
+DummyTextIO::DummyTextIO(void) {
+    for (int i=0; i<3; i++) {
+        controllers.push_back(DummyTextController(&std::cout));
     }
-    streams.clear();
 }
 
-void DummyTextIO::PrintError(const char *fmt, ...) {
-    // wrapper around printerHelper to allow variable argument forwarding
+void DummyTextIO::AddOutputStream(Level::level level, std::ostream *os) {
+    controllers[level].AddOutputStream(os);
+}
+
+void DummyTextIO::ResetStreams(Level::level level) {
+    controllers[level].ResetStreams();
+}
+
+void DummyTextIO::Print(Level::level level, const char *fmt, ...) {
     va_list argp;
     va_start(argp, fmt);
     printer Printer = printerHelper(fmt, argp);
     va_end(argp);
 
-    for (auto &stream : errorStreams) {
-        //*stream << Printer(fmt);
-        *stream << Printer;
-    }
-}
+    controllers[level].Print(Printer);
 
-void DummyTextIO::PrintDebug(const char *fmt, ...) {
-    va_list argp;
-    va_start(argp, fmt);
-    printer Printer = printerHelper(fmt, argp);
-    va_end(argp);
-
-    for (auto &stream : debugStreams) {
-        *stream << Printer;
-    }
-}
-
-void DummyTextIO::PrintString(const char *fmt, ...) {
-    va_list argp;
-    va_start(argp, fmt);
-    printer Printer = printerHelper(fmt, argp);
-    va_end(argp);
-
-    for (auto &stream : stringStreams) {
-        *stream << Printer;
-    }
-}
-
-void DummyTextIO::PrintFile(const char *fmt, ...) {
-    va_list argp;
-    va_start(argp, fmt);
-    printer Printer = printerHelper(fmt, argp);
-    va_end(argp);
-
-    for (auto &stream : fileStreams) {
-        // presumably the file will have been initalized w/ a name
-        *stream << Printer;
-        stream->close();
-    }
+    // after Print call, free storage allocated to the char buffer
+    // vasprintf provides a ptr to malloc'd storage - must be free'd by caller
+    free(Printer.s);
 }
