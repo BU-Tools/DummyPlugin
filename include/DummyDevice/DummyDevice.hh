@@ -10,6 +10,8 @@
 #include <memory>
 #include <sstream>
 
+#include <map>  // mapping commands and their aliases
+
 #include <Dummy/Dummy.hh>
 #include "DummyTextIO.hh"
 
@@ -51,6 +53,11 @@ namespace BUTool {
 
     // testing out writing to multiple streams at once
     CommandReturn::status FileTest(std::vector<std::string>, std::vector<uint64_t>);
+
+    // testing a method for getting all registered commands & aliases
+    // the idea is to have some means of automatically wrapping existing commands for the apollo-herd plugin
+    CommandReturn::status GetCommands(std::vector<std::string>, std::vector<uint64_t>);
+    std::map<std::string, std::vector<std::string> > commandList;
   };
 
     // register Dummydevice with factory

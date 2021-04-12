@@ -23,11 +23,13 @@ void DummyDevice::LoadCommandList() {
                 "instantiates the dummy\n" \
                 " Usage:\n"                \
                 " start\n");
+    AddCommandAlias("st", "start");
 
     AddCommand("operations",&DummyDevice::Operations,
                 "performs addition, subtraction, multiplication \n" \
                 " Usage:\n"                                         \
                 " operations operation x y\n");
+    AddCommandAlias("ops", "operations");
 
     AddCommand("add",&DummyDevice::Add,
                 "performs addition of two numbers\n" \
@@ -66,6 +68,26 @@ void DummyDevice::LoadCommandList() {
     
     AddCommand("filetest",&DummyDevice::FileTest,
                " ");
+
+    AddCommand("getcommands",&DummyDevice::GetCommands,
+               " ");
+}
+
+CommandReturn::status DummyDevice::GetCommands(std::vector<std::string>, std::vector<uint64_t>) {
+    // first get the commands and their aliases (if they exist)
+    commandList = GetCommandList();
+
+    // loop thru the map and make sure it worked 
+    std::map<std::string, std::vector<std::string>>::iterator it;
+    for (it = commandList.begin(); it != commandList.end(); it++) {
+        std::cout << it->first << std::endl;; // string key
+        // get vector of strings iterator
+        std::vector<std::string>::iterator it2;
+        for (it2 = it->second.begin(); it2 != it->second.end(); it2++) {
+            std::cout << *it2 << std::endl;
+        }
+    }
+    return CommandReturn::OK;
 }
 
 /*
